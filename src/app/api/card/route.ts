@@ -1,21 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchGitHubStats } from '@/lib/github';
 import { compileCyberCard } from '@/lib/cardCompiler';
+import { compileLanguagesCard } from '@/lib/languagesCompiler';
+import { compileStreakCard } from '@/lib/streakCompiler';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const username = searchParams.get('username') || searchParams.get('user') || 'theneotic';
+  const type = searchParams.get('type') || 'hud'; // 'hud' | 'languages' | 'streak'
   const theme = searchParams.get('theme') || 'cybercore';
   const accent = searchParams.get('accent') || undefined;
   const secondaryAccent = searchParams.get('secondary_accent') || undefined;
 
   try {
     const stats = await fetchGitHubStats(username);
-    const svg = compileCyberCard(stats, {
-      theme,
-      accent,
-      secondaryAccent,
-    });
+
+    let svg = '';
+    if (type === 'languages') {
+      svg = compileLanguagesCard(stats, { theme, accent });
+    } else if (type === 'streak') {
+      svg = compileStreakCard(stats, { theme, accent });
+    } else {
+      svg = compileCyberCard(stats, { theme, accent, secondaryAccent });
+    }
 
     return new NextResponse(svg, {
       status: 200,
