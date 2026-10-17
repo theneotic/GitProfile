@@ -59,11 +59,12 @@ export function renderProfileCard(
       <circle cx="${avatarX + avatarRadius}" cy="${avatarY + avatarRadius}" r="${avatarRadius}" />
     </clipPath>
     <circle cx="${avatarX + avatarRadius}" cy="${avatarY + avatarRadius}" r="${avatarRadius}" fill="${theme.progressColors.background}" />
-    ${
-      data.avatarUrl
-        ? `<image href="${escapeXml(data.avatarUrl)}" x="${avatarX}" y="${avatarY}" width="${avatarSize}" height="${avatarSize}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`
-        : ''
-    }
+    ${(() => {
+      const effectiveAvatar = options.custom_image || options.avatar_url || data.avatarUrl;
+      return effectiveAvatar
+        ? `<image href="${escapeXml(effectiveAvatar)}" x="${avatarX}" y="${avatarY}" width="${avatarSize}" height="${avatarSize}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" />`
+        : '';
+    })()}
   `);
 
   // Name & Handle
@@ -139,7 +140,13 @@ export function renderProfileCard(
   // Stats columns (Repos, Followers, Joined)
   const colWidth = (width - 50) / 3;
 
-  // Repos
+  // Repos (shows total repos and private repo count if authenticated)
+  const totalRepos = data.totalRepos ?? ((data.publicRepos || 0) + (data.privateRepos || 0));
+  const repoContent =
+    data.privateRepos && data.privateRepos > 0
+      ? `${formatCompact(totalRepos)} repos (${data.privateRepos} pvt)`
+      : `${formatCompact(data.publicRepos)} repos`;
+
   bodyElements.push(
     icon({
       name: 'repo',
@@ -151,9 +158,9 @@ export function renderProfileCard(
     text({
       x: 42,
       y: statsY,
-      content: `${formatCompact(data.publicRepos)} repos`,
+      content: repoContent,
       fill: theme.primaryText,
-      fontSize: 11,
+      fontSize: data.privateRepos && data.privateRepos > 0 ? 10 : 11,
       fontWeight: 600,
       fontFamily: '"JetBrains Mono", monospace',
     })

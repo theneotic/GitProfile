@@ -9,6 +9,8 @@ export interface ProfileCardData {
   followers: number;
   following: number;
   publicRepos: number;
+  privateRepos?: number;
+  totalRepos?: number;
   createdAt: string;
 }
 
@@ -18,6 +20,8 @@ export interface StatsCardData {
   totalStars: number;
   totalCommits: number;
   totalRepositories: number;
+  publicRepos?: number;
+  privateRepos?: number;
   pullRequests: number;
   issues: number;
   followers: number;
@@ -155,6 +159,8 @@ export const MOCK_PROFILE: ProfileCardData = {
   followers: 142,
   following: 89,
   publicRepos: 34,
+  privateRepos: 12,
+  totalRepos: 46,
   createdAt: '2022-04-12T00:00:00Z',
 };
 
@@ -163,7 +169,9 @@ export const MOCK_STATS: StatsCardData = {
   name: 'Alistair Siddiqui',
   totalStars: 486,
   totalCommits: 1842,
-  totalRepositories: 34,
+  totalRepositories: 46,
+  publicRepos: 34,
+  privateRepos: 12,
   pullRequests: 88,
   issues: 52,
   followers: 142,

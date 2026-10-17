@@ -43,13 +43,20 @@ export interface CardOptions {
   primary_text?: string;
   secondary_text?: string;
   border_radius?: number | string;
+  borderRadius?: number | string;
   hide_border?: boolean;
+  hideBorder?: boolean;
   font_family?: string;
   font_style?: FontStyleOption;
   layout?: Density;
+  density?: Density;
   animated?: boolean;
   sponsor?: boolean;
   mock?: boolean;
+  modules?: string;
+  custom_image?: string;
+  avatar_url?: string;
+  bg_image?: string;
   [key: string]: unknown;
 }
 

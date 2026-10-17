@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CARD_REGISTRY } from '../../../cards/registry';
 import { CardType, CardOptions, Density, FontStyleOption } from '../../../cards/engine/types';
 import { renderErrorCard } from '../../../cards/errorCard';
+import { getRealUserStats } from '../../../lib/github-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,6 +47,9 @@ export async function GET(
     });
   }
 
+  const username = searchParams.get('username') || 'octocat';
+  const isMock = searchParams.get('mock') === 'true';
+
   const densityParam = (searchParams.get('layout') || searchParams.get('density') || 'cozy') as Density;
   const density: Density = ['compact', 'cozy', 'detailed'].includes(densityParam)
     ? densityParam
@@ -60,28 +64,81 @@ export async function GET(
   const accent = searchParams.get('accent') || undefined;
   const background = searchParams.get('background') || undefined;
   const fontStyle = (searchParams.get('font_style') || 'sans') as FontStyleOption;
+  const modules = searchParams.get('modules') || undefined;
+  const customImage = searchParams.get('custom_image') || searchParams.get('avatar_url') || undefined;
+  const bgImage = searchParams.get('bg_image') || searchParams.get('custom_bg') || undefined;
 
   const options: CardOptions = {
     theme,
     density,
+    layout: density,
     animated,
+    hide_border: hideBorder,
     hideBorder,
+    border_radius: borderRadius,
     borderRadius,
     accent,
     background,
+    font_style: fontStyle,
     fontStyle,
+    modules,
+    custom_image: customImage,
+    avatar_url: customImage,
+    bg_image: bgImage,
   };
 
   try {
     const entry = CARD_REGISTRY[cardType];
-    const data = entry.getMockData();
-    const svg = entry.render(data, options);
+    let cardData: any = null;
+
+    // Check for user OAuth token from session cookie, query param, or Authorization header
+    let token: string | undefined = searchParams.get('token') || undefined;
+    if (!token) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.replace(/^Bearer\s+/, '');
+      } else {
+        const sessionCookie = request.cookies.get('instrument_session');
+        if (sessionCookie?.value) {
+          try {
+            const session = JSON.parse(sessionCookie.value);
+            if (session.username?.toLowerCase() === username.toLowerCase() && session.token) {
+              token = session.token;
+            }
+          } catch {
+            // Ignore
+          }
+        }
+      }
+    }
+
+    if (isMock) {
+      cardData = entry.getMockData();
+    } else {
+      try {
+        const real = await getRealUserStats(username, token);
+        if (cardType === 'stats') cardData = real.stats;
+        else if (cardType === 'streak') cardData = real.streak;
+        else if (cardType === 'languages') cardData = real.languages;
+        else if (cardType === 'profile') cardData = real.profile;
+        else if (cardType === 'rankings') cardData = real.rankings;
+        else cardData = entry.getMockData();
+      } catch (fetchErr) {
+        // If GitHub API limits or user not found, fallback to mock data
+        console.warn(`Fallback to mock for ${username}:`, fetchErr);
+        cardData = entry.getMockData();
+      }
+    }
+
+    const svg = entry.render(cardData, options);
 
     return new NextResponse(svg, {
       status: 200,
       headers: {
         'Content-Type': 'image/svg+xml; charset=utf-8',
-        'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400',
+        'Cache-Control': token
+          ? 'private, no-cache, no-store, must-revalidate'
+          : 'public, max-age=300, s-maxage=300, stale-while-revalidate=86400',
       },
     });
   } catch (err: any) {

@@ -21,7 +21,7 @@ import { StatsCardData, MOCK_STATS } from './mock-data';
 interface StatModuleConfig {
   id: string;
   label: string;
-  detailedSubtext: string;
+  detailedSubtext: string | ((data: StatsCardData) => string);
   icon: IconName;
   getValue: (data: StatsCardData) => string;
 }
@@ -56,6 +56,26 @@ const ALL_MODULES: StatModuleConfig[] = [
     getValue: (d) => formatCompact(d.issues),
   },
   {
+    id: 'repos',
+    label: 'Total Repositories',
+    detailedSubtext: (d) =>
+      d.privateRepos && d.privateRepos > 0
+        ? `${d.publicRepos ?? (d.totalRepositories - d.privateRepos)} public · ${d.privateRepos} private`
+        : 'across all owned repositories',
+    icon: 'repo',
+    getValue: (d) => {
+      const tot = d.totalRepositories ?? ((d.publicRepos || 0) + (d.privateRepos || 0));
+      return formatCompact(tot);
+    },
+  },
+  {
+    id: 'private_repos',
+    label: 'Private Repositories',
+    detailedSubtext: 'authenticated via GitHub OAuth',
+    icon: 'lock',
+    getValue: (d) => formatCompact(d.privateRepos ?? 0),
+  },
+  {
     id: 'contribs',
     label: 'Contributed Repositories',
     detailedSubtext: 'third-party open source projects',
@@ -86,7 +106,7 @@ export function renderStatsCard(
   data: StatsCardData = MOCK_STATS,
   options: CardOptions = {}
 ): string {
-  const density: Density = (options.layout as Density) || 'cozy';
+  const density: Density = (options.layout as Density) || (options.density as Density) || 'cozy';
   const width = getCardWidth(density, 400);
 
   const theme: Theme = isAutoTheme(options)
@@ -99,6 +119,11 @@ export function renderStatsCard(
     const requested = options.modules.split(',').map((m) => m.trim().toLowerCase());
     activeModules = ALL_MODULES.filter((m) => requested.includes(m.id));
     if (activeModules.length === 0) activeModules = ALL_MODULES;
+  } else {
+    // If user has no private repos, omit private_repos from default list to avoid showing 0
+    if (!data.privateRepos || data.privateRepos === 0) {
+      activeModules = ALL_MODULES.filter((m) => m.id !== 'private_repos');
+    }
   }
 
   const rowHeight = density === 'compact' ? 24 : density === 'detailed' ? 38 : 30;
@@ -150,11 +175,15 @@ export function renderStatsCard(
 
     // Detailed density subtext
     if (density === 'detailed') {
+      const subtextContent =
+        typeof mod.detailedSubtext === 'function'
+          ? mod.detailedSubtext(data)
+          : mod.detailedSubtext;
       rowMarkup.push(
         text({
           x: 50,
           y: rowY + 16,
-          content: mod.detailedSubtext,
+          content: subtextContent,
           fill: theme.secondaryText,
           fontSize: 10,
           opacity: 0.7,

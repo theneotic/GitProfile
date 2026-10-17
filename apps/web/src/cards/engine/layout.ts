@@ -1,5 +1,5 @@
 import { Theme, CardOptions, Density, IconName } from './types';
-import { rect, text, line, circle } from './helpers';
+import { rect, text, line, circle, escapeXml } from './helpers';
 import { icon } from './icons';
 
 export interface CardFrameOptions {
@@ -25,8 +25,9 @@ export function getCardWidth(density: Density, defaultWidth = 400): number {
 }
 
 export function getBorderRadius(options: CardOptions, defaultRadius = 4.5): number {
-  if (options.border_radius !== undefined) {
-    const val = typeof options.border_radius === 'string' ? parseFloat(options.border_radius) : options.border_radius;
+  const raw = options.border_radius ?? options.borderRadius;
+  if (raw !== undefined) {
+    const val = typeof raw === 'string' ? parseFloat(raw) : raw;
     return isNaN(val) ? defaultRadius : val;
   }
   return defaultRadius;
@@ -39,7 +40,10 @@ export function getBorderRadius(options: CardOptions, defaultRadius = 4.5): numb
 export function renderCardFrame(params: CardFrameOptions): string {
   const { width, height, theme, options, title, iconName, children } = params;
   const rx = getBorderRadius(options);
-  const hideBorder = Boolean(options.hide_border);
+  const hideBorder = Boolean(options.hide_border ?? options.hideBorder);
+  const customBgImage = (options.bg_image || (options.custom_image && !options.avatar_url ? options.custom_image : undefined)) as string | undefined;
+
+  const clipId = `card-clip-${Math.random().toString(36).substring(2, 8)}`;
 
   // Outer border with 0.5px offset to avoid sub-pixel blur
   const backgroundRect = rect({
@@ -53,12 +57,35 @@ export function renderCardFrame(params: CardFrameOptions): string {
     strokeWidth: hideBorder ? undefined : 1,
   });
 
-  const elements: string[] = [backgroundRect];
+  const elements: string[] = [
+    `<defs>
+      <clipPath id="${clipId}">
+        <rect x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" rx="${rx}" />
+      </clipPath>
+    </defs>`,
+    backgroundRect,
+  ];
+
+  // If a custom background image is supplied, render it smoothly with subtle overlay
+  if (customBgImage) {
+    elements.push(
+      `<image href="${customBgImage}" x="0.5" y="0.5" width="${width - 1}" height="${height - 1}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice" opacity="0.18" />`
+    );
+  }
 
   // Header
   if (title) {
     let titleX = 25;
-    if (iconName) {
+    const headerAvatar = options.avatar_url;
+    if (headerAvatar) {
+      const avatarClip = `header-avatar-${Math.random().toString(36).substring(2, 8)}`;
+      elements.push(
+        `<defs><clipPath id="${avatarClip}"><circle cx="34" cy="29" r="10" /></clipPath></defs>`,
+        `<circle cx="34" cy="29" r="10" fill="${theme.progressColors.background}" />`,
+        `<image href="${escapeXml(headerAvatar)}" x="24" y="19" width="20" height="20" clip-path="url(#${avatarClip})" preserveAspectRatio="xMidYMid slice" />`
+      );
+      titleX = 52;
+    } else if (iconName) {
       elements.push(
         icon({
           name: iconName,
