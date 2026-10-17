@@ -22,7 +22,22 @@ export default function DashboardProfileEditorPage() {
   const [newLabel, setNewLabel] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [savedNotice, setSavedNotice] = useState(false);
-  const username = 'theneotic';
+  const [username, setUsername] = useState('theneotic');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('instrument_preview_username');
+      if (saved) setUsername(saved);
+    }
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.authenticated && data.user?.username) {
+          setUsername(data.user.username);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleAddLink = () => {
     if (!newLabel || !newUrl) return;

@@ -13,7 +13,7 @@ import {
   LogOut,
   ExternalLink,
 } from 'lucide-react';
-import { getAccessToken, setAccessToken, API_BASE_URL } from '../../lib/api';
+import { setAccessToken } from '../../lib/api';
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
@@ -26,27 +26,57 @@ const NAV_ITEMS = [
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [username, setUsername] = useState('theneotic');
+  const [username, setUsername] = useState<string>('octocat');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = getAccessToken();
-    if (!token && process.env.NODE_ENV === 'production') {
-      // In production redirect if not authenticated
-      router.push('/login');
+    // 1. Direct URL query param pickup from OAuth redirect
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const authUser = params.get('auth_user');
+      const authAvatar = params.get('auth_avatar');
+      if (authUser) {
+        setUsername(authUser);
+        if (authAvatar) setUserAvatar(authAvatar);
+        setIsAuthenticated(true);
+        localStorage.setItem('instrument_preview_username', authUser);
+        window.history.replaceState(null, '', window.location.pathname);
+        return;
+      }
     }
-  }, [router]);
+
+    // 2. Cookie / API session check
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data.authenticated && data.user) {
+          setUsername(data.user.username);
+          setUserAvatar(data.user.avatar || null);
+          setIsAuthenticated(true);
+        } else {
+          const savedUser = localStorage.getItem('instrument_preview_username');
+          if (savedUser) {
+            setUsername(savedUser);
+          }
+        }
+      } catch {
+        // Fallback
+      }
+    }
+    checkAuth();
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await fetch('/api/auth/logout', { method: 'POST' });
     } catch {
-      // Ignore network errors on logout
+      // Ignore network errors
     }
     setAccessToken(null);
-    router.push('/');
+    localStorage.removeItem('instrument_preview_username');
+    router.push('/login');
   };
 
   return (
@@ -66,14 +96,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* User Card Chip */}
         <div className="border-b border-border p-4">
           <div className="flex items-center gap-3 rounded-md bg-surface-raised p-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 font-mono text-xs font-bold text-accent border border-accent/30">
-              {username.substring(0, 2).toUpperCase()}
-            </div>
+            {userAvatar ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={userAvatar}
+                alt={username}
+                className="h-8 w-8 rounded-full border border-border object-cover"
+              />
+            ) : (
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 font-mono text-xs font-bold text-accent border border-accent/30">
+                {username.substring(0, 2).toUpperCase()}
+              </div>
+            )}
             <div className="flex flex-col overflow-hidden">
               <span className="truncate text-xs font-semibold text-text-primary">
                 @{username}
               </span>
-              <span className="font-mono text-[10px] text-accent">Free Tier</span>
+              <span className="font-mono text-[10px] text-accent">
+                {isAuthenticated ? 'Connected via GitHub' : 'Preview Mode'}
+              </span>
             </div>
           </div>
         </div>
@@ -129,12 +170,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="font-display font-bold">InstrumentStats</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link
-              href="/dashboard/cards"
-              className="rounded-sm bg-accent px-3 py-1 font-mono text-xs font-bold text-accent-contrast"
-            >
-              Card Studio
-            </Link>
+            <span className="font-mono text-xs text-text-muted">@{username}</span>
           </div>
         </header>
 
