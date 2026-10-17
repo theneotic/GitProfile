@@ -1,29 +1,38 @@
 {
-  "name": "peaker-git-card",
+  "name": "instrument-stats",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "render-test": "node scripts/render-sample.js"
+  "description": "Instrument Stats — Precision Developer Telemetry & Real-Time Profile Cards",
+  "author": "Aurelius Valecrest <theneotic>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
   },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
-    "next": "^16.2.12",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2"
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "build:api": "turbo run build --filter=@instrument-stats/api",
+    "build:web": "turbo run build --filter=@instrument-stats/web",
+    "start:api": "pnpm --filter=@instrument-stats/api start",
+    "start:web": "pnpm --filter=@instrument-stats/web start",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "typecheck": "turbo run typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,css}\"",
+    "clean": "turbo run clean && rimraf node_modules"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.2",
+    "prettier": "^3.4.2",
+    "eslint": "^9.17.0",
+    "@eslint/js": "^9.17.0",
+    "typescript-eslint": "^8.18.0",
+    "eslint-config-prettier": "^9.1.0",
+    "rimraf": "^6.0.1"
   }
 }
