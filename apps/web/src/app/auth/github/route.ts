@@ -4,30 +4,27 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   const origin = request.nextUrl.origin;
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || process.env.GITHUB_CLIENT_ID;
+  const rawClientId = process.env.GITHUB_CLIENT_ID || process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || 'Ov23liAXtwA3sEW0T5XI';
+  const clientId = rawClientId.trim().replace(/[\r\n\t\s"']/g, '');
 
-  // 1. If backend API is configured, forward to backend OAuth endpoint
-  if (apiUrl && apiUrl.startsWith('http')) {
-    const backendUrl = new URL('/auth/github', apiUrl);
-    request.nextUrl.searchParams.forEach((val, key) => {
-      backendUrl.searchParams.set(key, val);
-    });
-    return NextResponse.redirect(backendUrl.toString());
+  if (!clientId) {
+    // If OAuth app is not configured yet, redirect back to login with a clear message
+    return NextResponse.redirect(
+      new URL('/login?error=oauth_not_configured', origin)
+    );
   }
 
-  // 2. If GitHub Client ID is configured directly, redirect to GitHub OAuth
-  if (clientId) {
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: `${origin}/login/callback`,
-      scope: 'read:user',
-      state: 'gh_state_' + Math.random().toString(36).substring(2),
-    });
-    return NextResponse.redirect(`https://github.com/login/oauth/authorize?${params.toString()}`);
-  }
+  const callbackUrl = `${origin}/api/auth/callback`;
+  const state = 'gh_' + Math.random().toString(36).substring(2);
 
-  // 3. Fallback for standalone demo mode:
-  // Seamlessly transition into the dashboard with a preview token so the user never encounters a 404
-  return NextResponse.redirect(new URL('/login/callback#access_token=demo-preview-token', origin));
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: callbackUrl,
+    scope: 'read:user,repo',
+    state,
+  });
+
+  return NextResponse.redirect(
+    `https://github.com/login/oauth/authorize?${params.toString()}`
+  );
 }
