@@ -144,6 +144,26 @@ export const THEMES: Record<string, Theme> = {
     progressColors: { background: '#3c3836', fill: '#b8bb26' },
     fontFamily: '"JetBrains Mono", monospace',
   },
+  'wabi-sabi': {
+    name: 'wabi-sabi',
+    background: '#151412',
+    primaryText: '#e7e5e4',
+    secondaryText: '#a8a29e',
+    border: '#383531',
+    accent: '#ca8a04',
+    progressColors: { background: '#2b2824', fill: '#ca8a04' },
+    fontFamily: '"Shippori Mincho", Georgia, serif',
+  },
+  'pixel-art': {
+    name: 'pixel-art',
+    background: '#0f0d1b',
+    primaryText: '#f3e8ff',
+    secondaryText: '#d8b4fe',
+    border: '#a855f7',
+    accent: '#e879f9',
+    progressColors: { background: '#272244', fill: '#facc15' },
+    fontFamily: '"Press Start 2P", "Silkscreen", monospace',
+  },
 };
 
 export const FONT_STACKS: Record<FontStyleOption, string> = {
