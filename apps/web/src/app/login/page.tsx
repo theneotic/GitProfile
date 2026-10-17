@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Terminal, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { Terminal, ShieldCheck, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { GitHubIcon } from '../../components/icons/GitHubIcon';
 import { API_BASE_URL, setAccessToken } from '../../lib/api';
 
@@ -11,83 +11,95 @@ export default function LoginPage() {
 
   const handleGitHubLogin = () => {
     setIsLoading(true);
-    window.location.href = `${API_BASE_URL}/auth/github`;
+    // If external API is configured, use it, otherwise use local Next.js /auth/github handler
+    const targetUrl = API_BASE_URL ? `${API_BASE_URL}/auth/github` : '/auth/github';
+    window.location.href = targetUrl;
   };
 
   const handleDemoLogin = () => {
-    // Generate demo dev token for immediate exploration
+    setIsLoading(true);
     setAccessToken('demo-preview-token');
     window.location.href = '/dashboard';
   };
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none" />
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12 bg-wabi-grid">
+      {/* Ambient Wabi-Sabi Background Seal */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute select-none font-display text-[180px] font-bold text-surface-raised/30 blur-[1px]"
+      >
+        侘寂
+      </div>
 
-      {/* Main Login Card (Section 5.5) */}
-      <div className="relative z-10 w-full max-w-md rounded-lg border border-border bg-surface p-8 shadow-2xl">
-        {/* Brand Icon Chip */}
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-sm border border-border bg-surface-raised text-accent">
-          <Terminal className="h-6 w-6" />
+      {/* Main Login Card with Wabi-Sabi 8-Bit Framing */}
+      <div className="relative z-10 w-full max-w-md border-2 border-border bg-surface p-6 sm:p-8 shadow-[8px_8px_0px_#0c0b0a] pixel-corners">
+        {/* Retro Header Tag */}
+        <div className="flex items-center justify-between border-b border-border/80 pb-3 mb-6">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 bg-moss animate-pulse" />
+            <span className="font-mono text-xs font-bold text-accent uppercase tracking-wider">
+              [ AUTH GATEWAY // SECURE ]
+            </span>
+          </div>
+          <span className="font-mono text-xs text-text-muted">LVL.99</span>
         </div>
 
         {/* Heading */}
-        <div className="mt-6 text-center">
-          <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary">
-            Welcome to Instrument<span className="text-accent">Stats</span>
+        <div className="text-center">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary">
+            Connect to <span className="text-accent underline decoration-accent/40 decoration-wavy">Instrument Stats</span>
           </h1>
-          <p className="mt-2 text-xs text-text-secondary">
-            High-precision GitHub profile cards built under Direct Instruments.
+          <p className="mt-2 text-xs sm:text-sm text-text-secondary font-sans leading-relaxed">
+            Generate high-precision SVG stats cards for your GitHub profile.
           </p>
         </div>
 
         {/* OAuth Information Box */}
-        <div className="mt-6 rounded-sm border border-border/60 bg-background p-3 text-xs text-text-tertiary">
-          <div className="flex items-center gap-2 font-mono font-medium text-text-secondary">
+        <div className="mt-6 border-2 border-border/80 bg-background/80 p-3.5 text-xs text-text-secondary shadow-inner">
+          <div className="flex items-center gap-2 font-sans font-bold text-text-primary">
             <ShieldCheck className="h-4 w-4 text-accent" />
-            <span>OAuth Mode: Connect securely via GitHub</span>
+            <span>Read-only permissions</span>
           </div>
-          <p className="mt-1 text-[11px] leading-relaxed">
-            Default requested scope is <code className="text-accent">read:user</code> only. We never
-            request write permissions or repository access without explicit confirmation.
+          <p className="mt-1 text-[11px] leading-relaxed text-text-muted font-sans">
+            We only request public profile metrics (<code className="text-accent font-mono">read:user</code>). We never modify code or repositories.
           </p>
         </div>
 
-        {/* Primary OAuth Button */}
+        {/* Action Buttons */}
         <div className="mt-6 flex flex-col gap-3">
           <button
             onClick={handleGitHubLogin}
             disabled={isLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-sm bg-accent py-3 font-mono text-sm font-bold text-accent-contrast shadow-lg shadow-accent/20 transition-all hover:bg-accent-hover disabled:opacity-50"
+            className="pixel-btn-gold flex w-full items-center justify-center gap-2.5 py-3 font-sans text-sm font-bold tracking-wide uppercase disabled:opacity-50"
           >
             <GitHubIcon className="h-4 w-4" />
-            <span>{isLoading ? 'Redirecting to GitHub...' : 'Continue with GitHub'}</span>
+            <span>{isLoading ? 'Connecting...' : 'Connect with GitHub ►'}</span>
           </button>
 
-          {/* Instant Sandbox / Demo Login */}
           <button
             onClick={handleDemoLogin}
-            className="flex w-full items-center justify-center gap-2 rounded-sm border border-border bg-surface-raised py-2.5 font-mono text-xs text-text-secondary transition-colors hover:border-text-secondary hover:text-text-primary"
+            disabled={isLoading}
+            className="pixel-btn flex w-full items-center justify-center gap-2 border-2 border-border bg-surface-raised py-2.5 font-sans text-xs font-bold text-text-primary hover:border-accent hover:text-accent shadow-[2px_2px_0px_#0c0b0a]"
           >
             <Sparkles className="h-3.5 w-3.5 text-accent" />
-            <span>Explore Dashboard in Demo Mode</span>
+            <span>Instant Sandbox (Demo Mode)</span>
           </button>
         </div>
 
         {/* Footer Guarantee */}
-        <div className="mt-8 flex items-center justify-between border-t border-border/40 pt-4 font-mono text-[11px] text-text-tertiary">
+        <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-3.5 font-mono text-[11px] text-text-muted">
           <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <span>Secure Encryption</span>
+            <CheckCircle2 className="h-3.5 w-3.5 text-moss" />
+            <span>Encrypted Session</span>
           </div>
-          <span>v1.0.0</span>
+          <span>Direct Instruments</span>
         </div>
       </div>
 
       <div className="mt-6 text-center">
-        <Link href="/" className="font-mono text-xs text-text-tertiary hover:text-text-secondary">
-          ← Back to Homepage
+        <Link href="/" className="font-mono text-xs text-text-muted hover:text-accent transition-colors">
+          ◄ Return to Homepage
         </Link>
       </div>
     </div>
