@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0c;
+  --surface: #121216;
+  --surface-raised: #18181d;
+  --border: #26262c;
+  --border-strong: #34343c;
+  --text-primary: #e8e8ec;
+  --text-secondary: #9a9aa4;
+  --text-muted: #60606a;
+  --accent: #3ddc84;
+  --accent-dim: #26a65f;
+  --accent-subtle: rgba(61, 220, 132, 0.08);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Subtle engineering background grid */
+.bg-grid-pattern {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(38, 38, 44, 0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(38, 38, 44, 0.4) 1px, transparent 1px);
+}
+
+/* Custom terminal scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0c;
+}
+::-webkit-scrollbar-thumb {
+  background: #26262c;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3ddc84;
+}
+
+/* Phosphor green terminal glow */
+.glow-accent {
+  box-shadow: 0 0 24px -4px rgba(61, 220, 132, 0.25);
+}
