@@ -11,7 +11,7 @@
 ```
 
 **High-precision, embeddable developer telemetry & real-time GitHub profile SVG cards.**  
-Built under the **Direct Instruments** brand by Aurelius Valecrest ([@theneotic](https://github.com/theneotic)).
+Built under the **Direct Instruments** brand by Alistair ([@theneotic](https://github.com/theneotic)).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-3ddc84.svg?style=flat-square)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
@@ -258,4 +258,4 @@ Instrument Stats uses exact, verified hex values from canonical open-source desi
 ## 📄 License
 
 Instrument Stats is released under the [MIT License](LICENSE).  
-Copyright © 2026 Direct Instruments · Aurelius Valecrest.
+Copyright © 2026 Direct Instruments · Alistair (Shamir Siddiqui).

@@ -38,22 +38,10 @@ export function Navbar() {
             Features
           </Link>
           <Link
-            href="/#demo"
-            className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
-          >
-            Live Builder
-          </Link>
-          <Link
             href="/#themes"
             className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
           >
             Themes
-          </Link>
-          <Link
-            href="/#comparison"
-            className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary"
-          >
-            Comparison
           </Link>
           <Link
             href="/docs"

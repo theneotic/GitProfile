@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Instrument Stats — Precision Developer Telemetry & Real-Time Profile Cards",
-  "author": "Aurelius Valecrest <theneotic>",
+  "author": "Alistair (Shamir Siddiqui) <theneotic>",
   "license": "MIT",
   "engines": {
     "node": ">=20.0.0",

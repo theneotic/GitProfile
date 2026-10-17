@@ -3,8 +3,6 @@ import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
 import { FeatureGrid } from '../components/FeatureGrid';
 import { ThemeShowcase } from '../components/ThemeShowcase';
-import { ComparisonTable } from '../components/ComparisonTable';
-import { CallToAction } from '../components/CallToAction';
 import { Footer } from '../components/Footer';
 
 export default function HomePage() {
@@ -15,8 +13,6 @@ export default function HomePage() {
         <Hero />
         <FeatureGrid />
         <ThemeShowcase />
-        <ComparisonTable />
-        <CallToAction />
       </main>
       <Footer />
     </div>

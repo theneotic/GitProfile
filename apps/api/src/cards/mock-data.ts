@@ -148,7 +148,7 @@ function generateMockActivityDays(): ActivityDayItem[] {
 
 export const MOCK_PROFILE: ProfileCardData = {
   username: 'theneotic',
-  name: 'Aurelius Valecrest',
+  name: 'Alistair Siddiqui',
   avatarUrl: 'https://avatars.githubusercontent.com/u/157010181?v=4',
   bio: 'Building direct instruments, autonomous systems & high-precision tools.',
   company: 'Direct Instruments',
@@ -160,7 +160,7 @@ export const MOCK_PROFILE: ProfileCardData = {
 
 export const MOCK_STATS: StatsCardData = {
   username: 'theneotic',
-  name: 'Aurelius Valecrest',
+  name: 'Alistair Siddiqui',
   totalStars: 486,
   totalCommits: 1842,
   totalRepositories: 34,

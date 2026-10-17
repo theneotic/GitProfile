@@ -1,48 +1,55 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Check, Copy, Sparkles, Terminal, Palette, Sliders, ExternalLink } from 'lucide-react';
-import { API_BASE_URL } from '../lib/api';
+import React, { useState, useEffect } from 'react';
+import { Check, Copy, Terminal, AlertCircle } from 'lucide-react';
+import { API_BASE_URL } from '../config/env';
 
-const DEMO_CARDS = [
-  { id: 'stats', label: 'Stats Overview' },
-  { id: 'streak', label: 'Streak' },
-  { id: 'languages', label: 'Languages' },
-  { id: 'activityGraph', label: 'Heatmap' },
-  { id: 'rankings', label: 'Rankings' },
-  { id: 'wrapped', label: 'Wrapped' },
+interface ThemeSwatch {
+  id: string;
+  label: string;
+  bg: string;
+  accent: string;
+}
+
+const DEMO_THEMES: ThemeSwatch[] = [
+  { id: 'terminal', label: 'Terminal', bg: '#0a0a0c', accent: '#3ddc84' },
+  { id: 'dark', label: 'GitHub Dark', bg: '#0d1117', accent: '#58a6ff' },
+  { id: 'dracula', label: 'Dracula', bg: '#282a36', accent: '#50fa7b' },
+  { id: 'nord', label: 'Nord', bg: '#2e3440', accent: '#88c0d0' },
+  { id: 'tokyo-night', label: 'Tokyo Night', bg: '#1a1b26', accent: '#7aa2f7' },
+  { id: 'auto', label: 'Auto (System)', bg: '#0d1117', accent: '#3ddc84' },
 ];
 
-const POPULAR_THEMES = [
-  { id: 'terminal', label: 'Terminal', color: '#3ddc84', bg: '#0a0a0c' },
-  { id: 'dracula', label: 'Dracula', color: '#ff79c6', bg: '#282a36' },
-  { id: 'nord', label: 'Nord', color: '#88c0d0', bg: '#2e3440' },
-  { id: 'tokyo-night', label: 'Tokyo Night', color: '#7aa2f7', bg: '#1a1b26' },
-  { id: 'catppuccin-mocha', label: 'Catppuccin', color: '#f5c2e7', bg: '#1e1e2e' },
-  { id: 'auto', label: 'Auto (System)', color: '#58a6ff', bg: '#0d1117' },
+const CARD_TABS = [
+  { id: 'stats', label: 'Stats' },
+  { id: 'streak', label: 'Streak' },
+  { id: 'languages', label: 'Languages' },
+  { id: 'rankings', label: 'Rankings' },
 ];
 
 export function LiveCardDemo() {
   const [selectedCard, setSelectedCard] = useState('stats');
-  const [username, setUsername] = useState('theneotic');
   const [theme, setTheme] = useState('terminal');
-  const [density, setDensity] = useState<'compact' | 'cozy' | 'detailed'>('cozy');
-  const [animated, setAnimated] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [origin, setOrigin] = useState('https://instrumentstats.dev');
 
-  // Build the public SVG query URL
-  const queryParams = new URLSearchParams();
-  queryParams.set('username', username.trim() || 'theneotic');
-  queryParams.set('theme', theme);
-  queryParams.set('layout', density);
-  if (animated && (selectedCard === 'stats' || selectedCard === 'streak')) {
-    queryParams.set('animated', 'true');
-  }
-  queryParams.set('mock', 'true'); // Demo always renders quickly and reliably
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setOrigin(window.location.origin);
+    }
+  }, []);
 
-  const cardEndpoint = selectedCard === 'activityGraph' ? 'activity-graph' : selectedCard;
-  const svgUrl = `${API_BASE_URL}/cards/${cardEndpoint}.svg?${queryParams.toString()}`;
-  const markdownEmbed = `[![${username}'s Stats](${svgUrl})](https://instrumentstats.dev)`;
+  // Use neutral octocat mock data by default
+  const cardEndpoint = selectedCard;
+  const basePath = API_BASE_URL ? API_BASE_URL : '';
+  const svgRelativeUrl = `${basePath}/cards/${cardEndpoint}.svg?username=octocat&theme=${theme}&mock=true`;
+  const svgAbsoluteUrl = API_BASE_URL
+    ? `${API_BASE_URL}/cards/${cardEndpoint}.svg?username=octocat&theme=${theme}&mock=true`
+    : `${origin}/cards/${cardEndpoint}.svg?username=octocat&theme=${theme}&mock=true`;
+
+  const markdownEmbed = `[![GitHub Stats](${svgAbsoluteUrl})](https://instrumentstats.dev)`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(markdownEmbed);
@@ -50,140 +57,132 @@ export function LiveCardDemo() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCardChange = (cardId: string) => {
+    setSelectedCard(cardId);
+    setIsLoading(true);
+    setHasError(false);
+  };
+
+  const handleThemeChange = (themeId: string) => {
+    setTheme(themeId);
+    setIsLoading(true);
+    setHasError(false);
+  };
+
   return (
-    <div className="w-full rounded-lg border border-border bg-surface p-4 shadow-2xl sm:p-6" id="demo">
-      {/* Top Controls Header */}
-      <div className="flex flex-col gap-4 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Card Type Selector Tabs */}
-        <div className="flex flex-wrap gap-1.5">
-          {DEMO_CARDS.map((card) => (
-            <button
-              key={card.id}
-              onClick={() => setSelectedCard(card.id)}
-              className={`rounded-sm px-3 py-1 font-mono text-xs transition-colors ${
-                selectedCard === card.id
-                  ? 'bg-accent text-accent-contrast font-bold'
-                  : 'bg-surface-raised text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              {card.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Username Input */}
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-text-tertiary">@</span>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="github-username"
-            className="w-32 rounded-sm border border-border bg-background px-2 py-1 font-mono text-xs text-text-primary focus:border-accent focus:outline-none"
-          />
-        </div>
-      </div>
-
-      {/* Customizer Sub-Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 py-3 border-b border-border/40 text-xs">
-        {/* Theme Swatches */}
-        <div className="flex items-center gap-2">
-          <Palette className="h-3.5 w-3.5 text-text-tertiary" />
-          <span className="font-mono text-text-secondary">Theme:</span>
-          <div className="flex items-center gap-1.5">
-            {POPULAR_THEMES.map((t) => (
+    <div className="w-full flex flex-col items-center" id="demo">
+      {/* Centered Controls Container: One Clean Bordered Box */}
+      <div className="w-full max-w-2xl rounded-lg border border-border bg-surface p-4 sm:p-6 shadow-xl">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Card Type Tabs */}
+          <div className="flex items-center gap-1 rounded-sm bg-background p-1 border border-border">
+            {CARD_TABS.map((tab) => (
               <button
-                key={t.id}
-                onClick={() => setTheme(t.id)}
-                title={t.label}
-                className={`flex h-5 w-5 items-center justify-center rounded-full border transition-transform ${
-                  theme === t.id
-                    ? 'scale-110 border-accent ring-2 ring-accent/30'
-                    : 'border-border/60 hover:scale-105'
-                }`}
-                style={{ backgroundColor: t.bg }}
-              >
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: t.color }} />
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Density & Animation */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <Sliders className="h-3.5 w-3.5 text-text-tertiary" />
-            <span className="font-mono text-text-secondary">Density:</span>
-            {(['compact', 'cozy', 'detailed'] as const).map((d) => (
-              <button
-                key={d}
-                onClick={() => setDensity(d)}
-                className={`rounded-sm px-2 py-0.5 font-mono text-[11px] capitalize ${
-                  density === d
-                    ? 'border border-accent/40 bg-accent-subtle text-accent'
+                key={tab.id}
+                onClick={() => handleCardChange(tab.id)}
+                className={`px-3 py-1 font-mono text-xs rounded-sm transition-colors ${
+                  selectedCard === tab.id
+                    ? 'bg-surface text-text-primary font-semibold shadow-xs'
                     : 'text-text-tertiary hover:text-text-secondary'
                 }`}
               >
-                {d}
+                {tab.label}
               </button>
             ))}
           </div>
 
-          {(selectedCard === 'stats' || selectedCard === 'streak') && (
-            <label className="flex cursor-pointer items-center gap-1.5 font-mono text-text-secondary hover:text-text-primary">
-              <input
-                type="checkbox"
-                checked={animated}
-                onChange={(e) => setAnimated(e.target.checked)}
-                className="accent-accent"
-              />
-              <span className="flex items-center gap-1">
-                <Sparkles className="h-3 w-3 text-accent" />
-                Animated
-              </span>
-            </label>
+          {/* Theme Swatches with Text Labels */}
+          <div className="flex flex-wrap items-center gap-2">
+            {DEMO_THEMES.map((t) => {
+              const isSelected = theme === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => handleThemeChange(t.id)}
+                  className={`flex items-center gap-2 rounded-sm px-2.5 py-1 text-left transition-all ${
+                    isSelected
+                      ? 'border border-accent/60 bg-surface-raised text-text-primary'
+                      : 'border border-border/60 bg-background text-text-tertiary hover:text-text-secondary hover:border-border'
+                  }`}
+                >
+                  {/* Mini Preview Box */}
+                  <span
+                    className="flex h-3 w-4.5 rounded-xs border border-white/10 shrink-0 overflow-hidden items-center justify-end px-0.5"
+                    style={{ backgroundColor: t.bg }}
+                  >
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: t.accent }}
+                    />
+                  </span>
+                  <span className="font-mono text-xs">{t.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* SVG Preview: Sits naturally on page background with exact aspect ratio */}
+      <div className="mt-8 flex w-full max-w-[495px] flex-col items-center">
+        <div className="relative w-full aspect-[495/195] flex items-center justify-center overflow-hidden rounded-md border border-border/80">
+          {/* Pulsing Loading Skeleton */}
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-surface animate-pulse">
+              <div className="h-6 w-32 rounded bg-surface-raised mb-4" />
+              <div className="h-3 w-48 rounded bg-surface-raised mb-2" />
+              <div className="h-3 w-40 rounded bg-surface-raised" />
+            </div>
+          )}
+
+          {/* Fallback State */}
+          {hasError && !isLoading && (
+            <div className="flex flex-col items-center justify-center p-6 text-center text-text-tertiary">
+              <AlertCircle className="h-6 w-6 text-text-tertiary mb-2" />
+              <p className="font-mono text-xs">Preview temporarily unavailable</p>
+              <button
+                onClick={() => {
+                  setHasError(false);
+                  setIsLoading(true);
+                }}
+                className="mt-3 text-xs text-accent underline hover:text-accent-hover"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Real Live Rendered SVG */}
+          {!hasError && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={svgRelativeUrl}
+              alt={`Octocat ${selectedCard} card`}
+              onLoad={() => setIsLoading(false)}
+              onError={() => {
+                setIsLoading(false);
+                setHasError(true);
+              }}
+              className={`w-full h-full object-contain transition-opacity duration-200 ${
+                isLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+            />
           )}
         </div>
-      </div>
 
-      {/* SVG Canvas Preview Container */}
-      <div className="my-6 flex min-h-[220px] items-center justify-center rounded-md border border-border/50 bg-[#060608] p-4 sm:p-8">
-        <div className="overflow-x-auto py-2">
-          {/* Direct live SVG image render */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={svgUrl}
-            alt={`${username}'s ${selectedCard} card`}
-            className="max-w-full drop-shadow-xl transition-all duration-300"
-          />
-        </div>
-      </div>
+        {/* Streamlined Markdown Embed Bar */}
+        <div className="mt-4 flex w-full items-center justify-between gap-3 rounded-md border border-border bg-surface px-3 py-2 text-xs">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <Terminal className="h-3.5 w-3.5 shrink-0 text-accent" />
+            <span className="truncate font-mono text-text-secondary">{markdownEmbed}</span>
+          </div>
 
-      {/* Embed Code Snippet Copy Bar */}
-      <div className="flex flex-col gap-2 rounded-sm border border-border bg-background p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <Terminal className="h-4 w-4 shrink-0 text-accent" />
-          <span className="truncate font-mono text-xs text-text-secondary">
-            {markdownEmbed}
-          </span>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          <a
-            href={svgUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 rounded-sm border border-border px-2 py-1 font-mono text-xs text-text-tertiary transition-colors hover:text-text-primary"
-          >
-            <ExternalLink className="h-3 w-3" />
-            <span>Open Raw</span>
-          </a>
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1.5 rounded-sm bg-accent px-3 py-1 font-mono text-xs font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
+            className="flex shrink-0 items-center gap-1.5 rounded-sm bg-accent px-3 py-1 font-mono text-xs font-semibold text-accent-contrast transition-colors hover:bg-accent-hover"
           >
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            <span>{copied ? 'Copied Markdown' : 'Copy Markdown'}</span>
+            {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
       </div>

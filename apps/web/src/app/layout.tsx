@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   description:
     'Generate deeply customizable, embeddable SVG stats cards for your GitHub profile with terminal aesthetics, saved presets, and automatic theme switching.',
   keywords: ['github stats', 'svg cards', 'developer profile', 'readme stats', 'github streak'],
-  authors: [{ name: 'Aurelius Valecrest', url: 'https://github.com/theneotic' }],
+  authors: [{ name: 'Alistair Siddiqui', url: 'https://github.com/theneotic' }],
   metadataBase: new URL('https://instrumentstats.dev'),
   openGraph: {
     title: 'Instrument Stats — GitHub Cards for Engineers',

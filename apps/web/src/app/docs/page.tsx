@@ -39,7 +39,7 @@ export default function DocsPage() {
           <div className="rounded-lg border border-border bg-surface p-4 font-mono text-xs">
             <div className="text-text-tertiary mb-2"># Standard Markdown Embed</div>
             <code className="text-accent block overflow-x-auto p-3 bg-background rounded">
-              [![Aurelius&apos;s GitHub Stats](https://instrumentstats.dev/cards/stats.svg?username=theneotic&amp;theme=terminal)](https://instrumentstats.dev)
+              [![Alistair&apos;s GitHub Stats](https://instrumentstats.dev/cards/stats.svg?username=theneotic&amp;theme=terminal)](https://instrumentstats.dev)
             </code>
           </div>
         </section>

@@ -30,7 +30,7 @@ export function Footer() {
                 rel="noreferrer"
                 className="text-text-primary hover:text-accent"
               >
-                Aurelius Valecrest
+                Alistair (Shamir Siddiqui)
               </a>
               .
             </p>
@@ -44,8 +44,8 @@ export function Footer() {
             <Link href="/#themes" className="hover:text-text-primary">
               14 Palettes
             </Link>
-            <Link href="/#comparison" className="hover:text-text-primary">
-              Feature Matrix
+            <Link href="/#features" className="hover:text-text-primary">
+              Features
             </Link>
             <a
               href="https://github.com/theneotic/instrument-stats"
