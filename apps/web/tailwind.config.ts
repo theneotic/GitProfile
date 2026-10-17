@@ -10,39 +10,67 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0c',
+        background: '#151412', // Wabi-Sabi deep sumi basalt stone
         surface: {
-          DEFAULT: '#121216',
-          raised: '#18181d',
+          DEFAULT: '#1c1a17', // Aged stone block
+          raised: '#24211d',  // Carved slate
+          alt: '#2b2824',     // Raw weathered earth
         },
         border: {
-          DEFAULT: '#26262c',
-          strong: '#34343c',
+          DEFAULT: '#383531', // Weathered mortar seam
+          strong: '#524c45',  // Chiseled stone edge
+          gold: '#ca8a04',    // Kintsugi gold repair seam
         },
         text: {
-          primary: '#e8e8ec',
-          secondary: '#9a9aa4',
-          tertiary: '#5f5f6b',
+          primary: '#e7e5e4',   // Unbleached washi paper
+          secondary: '#a8a29e', // Riverbed silt
+          tertiary: '#78716c',  // Ancient soot
+          muted: '#57534e',
         },
         accent: {
-          DEFAULT: '#3ddc84',
-          dim: '#26a65f',
-          contrast: '#052e18',
+          DEFAULT: '#ca8a04',   // Kintsugi gold lacquer
+          bright: '#eab308',    // Gleaming gold leaf
+          hover: '#d97706',
+          dim: '#854d0e',       // Aged amber patina
+          contrast: '#151412',  // Deep sumi ink on gold
+          subtle: 'rgba(202, 138, 4, 0.12)',
+        },
+        moss: {
+          DEFAULT: '#65a30d',   // Zen garden moss
+          dim: '#4d7c0f',
+        },
+        sakura: {
+          DEFAULT: '#f472b6',   // Retro pixel cherry blossom
         },
         danger: '#ef4444',
-        warning: '#f5a623',
+        warning: '#f59e0b',
       },
       fontFamily: {
-        display: ['"Space Grotesk"', 'sans-serif'],
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        display: ['"Shippori Mincho"', 'Georgia', 'serif'],
+        serif: ['"Shippori Mincho"', 'Georgia', 'serif'],
+        sans: ['"Space Grotesk"', 'Inter', '-apple-system', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Space Mono"', 'monospace'],
+        pixel: ['"Press Start 2P"', 'monospace'],
       },
       borderRadius: {
-        sm: '6px',
-        DEFAULT: '12px',
-        md: '12px',
-        lg: '16px',
-        xl: '20px',
+        none: '0px',
+        xs: '0px',
+        sm: '0px',
+        DEFAULT: '0px',
+        md: '0px',
+        lg: '0px',
+        xl: '0px',
+        '2xl': '0px',
+        full: '0px',
+      },
+      boxShadow: {
+        pixel: '3px 3px 0px #0c0b0a',
+        'pixel-lg': '4px 4px 0px #0c0b0a',
+        'pixel-xl': '6px 6px 0px #0c0b0a',
+        'pixel-huge': '8px 8px 0px #0c0b0a',
+        'pixel-gold': '3px 3px 0px #78350f',
+        'pixel-stone': '3px 3px 0px #383531',
+        'pixel-pressed': '1px 1px 0px #0c0b0a',
       },
     },
   },
