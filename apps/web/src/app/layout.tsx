@@ -1,45 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { GrainOverlay } from '../components/ui/GrainOverlay';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  display: 'swap',
-});
-
 export const metadata: Metadata = {
-  title: 'Instrument Stats — High-Precision GitHub Stats Cards',
+  title: 'Instrument Stats — Wabi-Sabi & Pixel GitHub Stats Cards',
   description:
-    'Generate deeply customizable, embeddable SVG stats cards for your GitHub profile with terminal aesthetics, saved presets, and automatic theme switching.',
-  keywords: ['github stats', 'svg cards', 'developer profile', 'readme stats', 'github streak'],
-  authors: [{ name: 'Alistair Siddiqui', url: 'https://github.com/theneotic' }],
-  metadataBase: new URL('https://instrumentstats.dev'),
+    'Generate deeply customizable, embeddable SVG stats cards for your GitHub profile with wabi-sabi stone aesthetics, 8-bit pixel precision, and transparent rankings.',
+  keywords: ['github stats', 'svg cards', 'wabi-sabi', 'pixel art', 'developer profile', 'readme stats', 'github streak'],
+  authors: [{ name: 'Aurelius Valecrest', url: 'https://github.com/theneotic' }],
+  metadataBase: new URL('https://gitprofilestat.vercel.app'),
   openGraph: {
-    title: 'Instrument Stats — GitHub Cards for Engineers',
-    description: 'High-precision, embeddable SVG cards with dark terminal aesthetics & transparent rankings.',
-    url: 'https://instrumentstats.dev',
+    title: 'Instrument Stats — Wabi-Sabi & 8-Bit Pixel GitHub Cards',
+    description: 'High-precision, embeddable SVG cards with wabi-sabi stone palettes, pixel-art geometry, and transparent formulas.',
+    url: 'https://gitprofilestat.vercel.app',
     siteName: 'Instrument Stats',
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Instrument Stats — High-Precision GitHub Stats Cards',
-    description: 'Generate deeply customizable, embeddable SVG stats cards for your GitHub profile.',
+    title: 'Instrument Stats — Wabi-Sabi & Pixel GitHub Stats Cards',
+    description: 'Generate deeply customizable, embeddable SVG stats cards with wabi-sabi aesthetics and 8-bit pixel precision.',
   },
 };
 
@@ -49,11 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`dark ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
-    >
-      <body className="min-h-screen bg-background text-text-primary antialiased selection:bg-accent/20 selection:text-accent">
+    <html lang="en" className="dark">
+      <body className="min-h-screen bg-background text-text-primary antialiased selection:bg-accent/25 selection:text-accent-bright">
         <GrainOverlay />
         {children}
       </body>
